@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+    <extension point="org.eclipse.ui.perspectiveExtensions">
+       <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+           <view id="org.eclipse.ui.views.PropertySheet"
+               relationship="stack"
+               relative="org.eclipse.ui.views.TaskList"
+               visible="true"/>
+           <newWizardShortcut id="org.eclipse.ui.wizards.new.project"/>
+           <newWizardShortcut id="com.nexusbpm.dataselector.newTreeWizard"/>
+       </perspectiveExtension>
+    </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ui.ide.workbench"
+            name="Data Selector">
+         <property
+               name="appName"
+               value="Data Selector"/>
+         <property name="preferenceCustomization" value="plugin_customization.ini"/>
+         <property
+               name="windowImages"
+               value="platform:/plugin/com.nexusbpm.dataselector/icons/16x16/filesystems/database.gif,platform:/plugin/com.nexusbpm.dataselector/icons/32x32/filesystems/database.gif">
+         </property>
+         <property
+               name="aboutImage"
+               value="platform:/plugin/com.nexusbpm.dataselector/icons/dataselector2.gif">
+         </property>
+      </product>
+   </extension>
+
+</plugin>

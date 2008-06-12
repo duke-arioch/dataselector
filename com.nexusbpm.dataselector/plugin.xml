@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+    <extension-point id="modelExtension"
+        name="Data Selector Model Extension"
+        schema="schema/com.nexusbpm.dataselector.modelExtension.exsd"/>
+    
+    <extension-point id="treeMenuExtension"
+        name="Data Selector Tree Popup Menu Extension"
+        schema="schema/com.nexusbpm.dataselector.treeMenuExtension.exsd"/>
+    
+    <extension point="org.eclipse.ui.editors">
+        <editor id="com.nexusbpm.dataselector"
+            name="Data Selector"
+            class="com.nexusbpm.dataselector.editor.DataSelectorEditor"
+            icon="icons/16x16/filesystems/database.png"
+            extensions="lst,dst,tree"
+            contributorClass="com.nexusbpm.dataselector.editor.DataSelectorActionBarContributor"
+            default="true">
+        </editor>
+    </extension>
+    <extension point="org.eclipse.ui.perspectives">
+        <perspective id="com.nexusbpm.dataselector.Perspective"
+            name="Data Selector"
+            icon="icons/16x16/filesystems/database.png"
+            class="com.nexusbpm.dataselector.PerspectiveFactory"/>
+    </extension>
+    <extension point="org.eclipse.ui.perspectiveExtensions">
+       <perspectiveExtension targetID="com.nexusbpm.dataselector.Perspective">
+           <newWizardShortcut id="org.eclipse.ui.wizards.new.folder"/>
+           <newWizardShortcut id="org.eclipse.ui.wizards.new.file"/>
+           <newWizardShortcut id="org.eclipse.ui.wizards.new.project"/>
+           <newWizardShortcut id="com.nexusbpm.dataselector.newTreeWizard"/>
+       </perspectiveExtension>
+    </extension>
+    <extension point="org.eclipse.ui.newWizards">
+        <wizard id="com.nexusbpm.dataselector.newTreeWizard"
+            name="Data Selector Tree"
+            category="com.nexusbpm.dataselector.category"
+            class="com.nexusbpm.dataselector.wizard.NewTreeWizard"
+            icon="icons/16x16/filesystems/database.png">
+            <description>Creates a new Data Selector tree</description>
+            <selection class="org.eclipse.core.resources.IResource"/>
+        </wizard>
+        <category id="com.nexusbpm.dataselector.category" name="Data Selector"/>
+        <primaryWizard id="com.nexusbpm.dataselector.newTreeWizard"/>
+    </extension>
+    <extension point="org.eclipse.ui.perspectiveExtensions">
+        <perspectiveExtension targetID="org.eclipse.ui.resourcePerspective">
+            <newWizardShortcut id="com.nexusbpm.dataselector.newTreeWizard"/>
+        </perspectiveExtension>
+        <perspectiveExtension targetID="org.eclipse.jdt.ui.JavaPerspective">
+            <newWizardShortcut id="com.nexusbpm.dataselector.newTreeWizard"/>
+        </perspectiveExtension>
+        <perspectiveExtension targetID="com.nexusbpm.NexusPerspective">
+            <newWizardShortcut id="com.nexusbpm.dataselector.newTreeWizard"/>
+        </perspectiveExtension>
+    </extension>
+    
+    <extension point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+        <propertyContributor contributorId="com.nexusbpm.dataselector.propertyContributor">
+            <propertyCategory category="com.nexusbpm.dataselector.topAdditions"/>
+            <propertyCategory category="com.nexusbpm.dataselector.treeProperties"/>
+            <propertyCategory category="com.nexusbpm.dataselector.nodeProperties"/>
+            <propertyCategory category="com.nexusbpm.dataselector.nodeConditions"/>
+            <propertyCategory category="com.nexusbpm.dataselector.statistics"/>
+            <propertyCategory category="com.nexusbpm.dataselector.sql"/>
+            <propertyCategory category="com.nexusbpm.dataselector.additions"/>
+        </propertyContributor>
+    </extension>
+    <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+        <propertyTabs contributorId="com.nexusbpm.dataselector.propertyContributor">
+            <propertyTab id="com.nexusbpm.dataselector.treeProperties"
+                label="Tree Properties"
+                category="com.nexusbpm.dataselector.treeProperties"/>
+            <propertyTab id="com.nexusbpm.dataselector.nodeProperties"
+                label="Node Properties"
+                category="com.nexusbpm.dataselector.nodeProperties"/>
+            <propertyTab id="com.nexusbpm.dataselector.nodeConditions"
+                label="Node Conditions"
+                category="com.nexusbpm.dataselector.nodeConditions"/>
+            <propertyTab id="com.nexusbpm.dataselector.statistics"
+                label="Statistics"
+                category="com.nexusbpm.dataselector.statistics"/>
+            <propertyTab id="com.nexusbpm.dataselector.sql"
+                label="SQL"
+                category="com.nexusbpm.dataselector.sql"/>
+        </propertyTabs>
+    </extension>
+    <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+        <propertySections contributorId="com.nexusbpm.dataselector.propertyContributor">
+            <propertySection id="com.nexusbpm.dataselector.treeProperties"
+                tab="com.nexusbpm.dataselector.treeProperties"
+                class="com.nexusbpm.dataselector.properties.TreePropertiesSection"
+                filter="com.nexusbpm.dataselector.properties.TreePropertiesFilter"/>
+            <propertySection id="com.nexusbpm.dataselector.nodeProperties"
+                tab="com.nexusbpm.dataselector.nodeProperties"
+                class="org.eclipse.ui.views.properties.tabbed.AdvancedPropertySection"
+                filter="com.nexusbpm.dataselector.properties.NodePropertiesFilter"/>
+            <propertySection id="com.nexusbpm.dataselector.nodeConditions"
+                tab="com.nexusbpm.dataselector.nodeConditions"
+                class="com.nexusbpm.dataselector.properties.NodeConditionsSection"
+                filter="com.nexusbpm.dataselector.properties.NodePropertiesFilter"
+                enablesFor="1"/>
+            <propertySection id="com.nexusbpm.dataselector.statistics"
+                tab="com.nexusbpm.dataselector.statistics"
+                class="com.nexusbpm.dataselector.properties.StatisticsPropertySection"
+                filter="com.nexusbpm.dataselector.properties.StatisticsFilter"
+                enablesFor="1"/>
+            <propertySection id="com.nexusbpm.dataselector.sql"
+                tab="com.nexusbpm.dataselector.sql"
+                class="com.nexusbpm.dataselector.properties.SQLPropertySection"
+                filter="com.nexusbpm.dataselector.properties.SQLFilter"/>
+       </propertySections>
+    </extension>
+    
+    <extension point="com.nexusbpm.dataselector.modelExtension">
+        <extensionPersistance id="com.nexusbpm.dataselector.displayExtensionsPersistance"
+            class="com.nexusbpm.dataselector.model.persistance.DisplayExtensionsPersistance">
+        </extensionPersistance>
+    </extension>
+</plugin>

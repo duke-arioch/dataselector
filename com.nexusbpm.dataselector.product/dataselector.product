@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.1"?>
+
+<product name="Data Selector" id="com.nexusbpm.dataselector.product.product" application="org.eclipse.ui.ide.workbench" useFeatures="true">
+
+   <aboutInfo>
+      <image path="/com.nexusbpm.dataselector/icons/dataselector2.gif"/>
+   </aboutInfo>
+
+   <configIni use="default"/>
+
+   <launcherArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
+   </launcherArgs>
+
+   <windowImages i16="/com.nexusbpm.dataselector/icons/16x16/filesystems/database.gif" i32="/com.nexusbpm.dataselector/icons/32x32/filesystems/database.gif"/>
+
+   <launcher>
+      <solaris/>
+      <win useIco="true">
+         <ico path="/com.nexusbpm.dataselector/icons/database.ico"/>
+         <bmp/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <plugins>
+      <plugin id="com.nexusbpm.dataselector.product"/>
+   </plugins>
+
+   <features>
+      <feature id="com.nexusbpm.dataselector.drools.feature" version="1.0.0"/>
+      <feature id="com.nexusbpm.dataselector.product.feature" version="1.2.0"/>
+      <feature id="org.eclipse.gef" version="3.3.1.v20070814"/>
+      <feature id="org.eclipse.platform" version="3.3.2.R33x_v20071022-_19UEksF-G8Yc6bUv3Dz"/>
+   </features>
+
+</product>

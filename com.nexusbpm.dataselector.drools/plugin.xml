@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.3"?>
+<plugin>
+    <extension point="com.nexusbpm.dataselector.treeMenuExtension">
+       <item group="com.nexusbpm.dataselector.group.save"
+             class="com.nexusbpm.dataselector.drools.actions.SaveDroolsAction"/>
+    </extension>
+    
+    <extension point="com.nexusbpm.dataselector.modelExtension">
+        <extensionPersistance id="com.nexusbpm.dataselector.drools.persistance"
+            class="com.nexusbpm.dataselector.drools.model.DroolsExtensionPersistance">
+        </extensionPersistance>
+    </extension>
+    
+    <extension point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+        <propertyTabs contributorId="com.nexusbpm.dataselector.propertyContributor">
+            <propertyTab id="com.nexusbpm.dataselector.drools"
+                label="Drools"
+                category="com.nexusbpm.dataselector.additions"/>
+        </propertyTabs>
+    </extension>
+    <extension point="org.eclipse.ui.views.properties.tabbed.propertySections">
+        <propertySections contributorId="com.nexusbpm.dataselector.propertyContributor">
+            <propertySection id="com.nexusbpm.dataselector.drools"
+                tab="com.nexusbpm.dataselector.drools"
+                class="com.nexusbpm.dataselector.drools.properties.DroolsPropertySection"
+                filter="com.nexusbpm.dataselector.properties.NodePropertiesFilter"
+                enablesFor="1"/>
+       </propertySections>
+    </extension>
+</plugin>
