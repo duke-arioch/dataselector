@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.internal.views.properties.tabbed.view.Tab;
+import org.eclipse.ui.views.properties.tabbed.TabContents;
 import org.eclipse.ui.internal.views.properties.tabbed.view.TabDescriptor;
 import org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyComposite;
 import org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyRegistry;
@@ -72,7 +72,7 @@ public class TabbedPropertySheetPage
 		 */
 		public void selectionChanged(SelectionChangedEvent event) {
 			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			Tab tab = null;
+			TabContents tab = null;
 			TabDescriptor descriptor = (TabDescriptor) selection.getFirstElement();
 			
 			if (descriptor == null) {
@@ -84,14 +84,14 @@ public class TabbedPropertySheetPage
 				// can not cache based on the id - tabs may have the same id,
 				// but different section depending on the selection
 //				tab = (Tab) descriptorToTab.get(descriptor);
-			    tab = (Tab) ((Map) getField("descriptorToTab")).get(descriptor);
+			    tab = (TabContents) ((Map) getField("descriptorToTab")).get(descriptor);
 
 //				if (tab != currentTab) {
 //					hideTab(currentTab);
 //				}
 			    Object currentTab = getCurrentTab();
 			    if(tab != currentTab) {
-			        hideTab((Tab) currentTab);
+			        hideTab((TabContents) currentTab);
 			    }
 			    
 //				Composite tabComposite = (Composite) tabToComposite.get(tab);
@@ -144,7 +144,7 @@ public class TabbedPropertySheetPage
 		/**
 		 * Shows the given tab.
 		 */
-		private void showTab(Tab target) {
+		private void showTab(TabContents target) {
 			if (target != null) {
 			    Composite tabComposite = (Composite) ((Map) getField("tabToComposite")).get(target);
 //				Composite tabComposite = (Composite) tabToComposite.get(target);
@@ -163,7 +163,7 @@ public class TabbedPropertySheetPage
 		/**
 		 * Hides the given tab.
 		 */
-		private void hideTab(Tab target) {
+		private void hideTab(TabContents target) {
 			if (target != null) {
 //				Composite tabComposite = (Composite) tabToComposite.get(target);
 			    Composite tabComposite = (Composite) ((Map) getField("tabToComposite")).get(target);
