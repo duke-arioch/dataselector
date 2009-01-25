@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/ostermillerutils_1_05_00_for_java_1_4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mssqlserver.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mysql.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ojdbc14_g.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/postgresql-8.2-505.jdbc3.jar"/>
