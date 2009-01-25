@@ -31,240 +31,240 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.views.properties.tabbed.TabContents;
-import org.eclipse.ui.internal.views.properties.tabbed.view.TabDescriptor;
 import org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyComposite;
 import org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyRegistry;
 import org.eclipse.ui.internal.views.properties.tabbed.view.TabbedPropertyViewer;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
+import org.eclipse.ui.views.properties.tabbed.ITabDescriptor;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertySheetPageContributor;
+import org.eclipse.ui.views.properties.tabbed.TabContents;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 /**
  * Extends the tabbed property sheet page to not call setMinSize on the
  * ScrolledComposite that contains the contents of the property tab.
  */
-@SuppressWarnings({"restriction", "unchecked"})
+@SuppressWarnings({"unchecked"})
 public class TabbedPropertySheetPage
-	extends org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage
-	implements IPropertySheetPage, ILabelProviderListener {
+    extends org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage
+    implements IPropertySheetPage, ILabelProviderListener {
     
     private List<DisposeListener> listeners = new ArrayList<DisposeListener>();
     
-	/**
-	 * Label provider for the ListViewer.
-	 */
-	protected class TabbedPropertySheetPageLabelProvider extends LabelProvider {
-		public String getText(Object element) {
-			if (element instanceof TabDescriptor) {
-				return ((TabDescriptor) element).getLabel();
-			}
-			return null;
-		}
-	}
-	
-	/**
-	 * SelectionChangedListener for the ListViewer.
-	 */
-	protected class SelectionChangedListener implements ISelectionChangedListener {
-		/**
-		 * Shows the tab associated with the selection.
-		 */
-		public void selectionChanged(SelectionChangedEvent event) {
-			IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-			TabContents tab = null;
-			TabDescriptor descriptor = (TabDescriptor) selection.getFirstElement();
-			
-			if (descriptor == null) {
-				// pretend the tab is empty.
-//				hideTab(currentTab);
-			    hideTab(getCurrentTab());
-			} else {
-				// create tab if necessary
-				// can not cache based on the id - tabs may have the same id,
-				// but different section depending on the selection
-//				tab = (Tab) descriptorToTab.get(descriptor);
-			    tab = (TabContents) ((Map) getField("descriptorToTab")).get(descriptor);
+    /**
+     * Label provider for the ListViewer.
+     */
+    protected class TabbedPropertySheetPageLabelProvider extends LabelProvider {
+        public String getText(Object element) {
+            if (element instanceof ITabDescriptor) {
+                return ((ITabDescriptor) element).getLabel();
+            }
+            return null;
+        }
+    }
+    
+    /**
+     * SelectionChangedListener for the ListViewer.
+     */
+    protected class SelectionChangedListener implements ISelectionChangedListener {
+        /**
+         * Shows the tab associated with the selection.
+         */
+        public void selectionChanged(SelectionChangedEvent event) {
+            IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+            TabContents tab = null;
+            ITabDescriptor descriptor = (ITabDescriptor) selection.getFirstElement();
+            
+            if (descriptor == null) {
+                // pretend the tab is empty.
+//                hideTab(currentTab);
+                hideTab(getCurrentTab());
+            } else {
+                // create tab if necessary
+                // can not cache based on the id - tabs may have the same id,
+                // but different section depending on the selection
+//                tab = (Tab) descriptorToTab.get(descriptor);
+                tab = (TabContents) ((Map) getField("descriptorToTab")).get(descriptor);
+                
+//                if (tab != currentTab) {
+//                    hideTab(currentTab);
+//                }
+                TabContents currentTab = getCurrentTab();
+                if(tab != currentTab) {
+                    hideTab(currentTab);
+                }
+                
+//                Composite tabComposite = (Composite) tabToComposite.get(tab);
+                Composite tabComposite = (Composite) ((Map) getField("tabToComposite")).get(tab);
+                if (tabComposite == null) {
+//                    tabComposite = createTabComposite();
+                    tabComposite = (Composite) executeMethod("createTabComposite", new Class[] {}, null);
+                    tab.createControls(tabComposite, TabbedPropertySheetPage.this);
+                    // tabAreaComposite.layout(true);
+//                    tabToComposite.put(tab, tabComposite);
+                    ((Map) getField("tabToComposite")).put(tab, tabComposite);
+                }
+                // force widgets to be resized
+//                tab.setInput(tabbedPropertyViewer.getWorkbenchPart(),
+//                    (ISelection) tabbedPropertyViewer.getInput());
+                tab.setInput(
+                        ((TabbedPropertyViewer) getField("tabbedPropertyViewer")).getWorkbenchPart(),
+                        (ISelection) ((TabbedPropertyViewer) getField("tabbedPropertyViewer")).getInput());
+                
+                // store tab selection
+//                storeCurrentTabSelection(descriptor.getLabel());
+                executeMethod(
+                        "storeCurrentTabSelection",
+                        new Class[] {String.class},
+                        new Object[] {descriptor.getLabel()});
+                
+//                if (tab != currentTab) {
+//                    showTab(tab);
+//                }
+                currentTab = getCurrentTab();
+                if(tab != currentTab) {
+                    showTab(tab);
+                }
+                
+                tab.refresh();
+            }
+//            tabbedPropertyComposite.getTabComposite().layout(true);
+            ((TabbedPropertyComposite)getField("tabbedPropertyComposite")).getTabComposite().layout(true);
+//            currentTab = tab;
+            setField("currentTab", tab);
+            // don't call resizeScrolledComposite() because it causes the contents to constantly grow
+//            resizeScrolledComposite();
 
-//				if (tab != currentTab) {
-//					hideTab(currentTab);
-//				}
-			    Object currentTab = getCurrentTab();
-			    if(tab != currentTab) {
-			        hideTab((TabContents) currentTab);
-			    }
-			    
-//				Composite tabComposite = (Composite) tabToComposite.get(tab);
-			    Composite tabComposite = (Composite) ((Map) getField("tabToComposite")).get(tab);
-				if (tabComposite == null) {
-//					tabComposite = createTabComposite();
-				    tabComposite = (Composite) executeMethod("createTabComposite", new Class[] {}, null);
-					tab.createControls(tabComposite, TabbedPropertySheetPage.this);
-					// tabAreaComposite.layout(true);
-//					tabToComposite.put(tab, tabComposite);
-					((Map) getField("tabToComposite")).put(tab, tabComposite);
-				}
-				// force widgets to be resized
-//				tab.setInput(tabbedPropertyViewer.getWorkbenchPart(),
-//					(ISelection) tabbedPropertyViewer.getInput());
-				tab.setInput(
-				        ((TabbedPropertyViewer) getField("tabbedPropertyViewer")).getWorkbenchPart(),
-				        (ISelection) ((TabbedPropertyViewer) getField("tabbedPropertyViewer")).getInput());
-				
-				// store tab selection
-//				storeCurrentTabSelection(descriptor.getLabel());
-				executeMethod(
-				        "storeCurrentTabSelection",
-				        new Class[] {String.class},
-				        new Object[] {descriptor.getLabel()});
-				
-//				if (tab != currentTab) {
-//					showTab(tab);
-//				}
-				currentTab = getCurrentTab();
-				if(tab != currentTab) {
-				    showTab(tab);
-				}
-				
-				tab.refresh();
-			}
-//			tabbedPropertyComposite.getTabComposite().layout(true);
-			((TabbedPropertyComposite)getField("tabbedPropertyComposite")).getTabComposite().layout(true);
-//			currentTab = tab;
-			setField("currentTab", tab);
-			// don't call resizeScrolledComposite() because it causes the contents to constantly grow
-//			resizeScrolledComposite();
-
-			if (descriptor != null) {
-//				handleTabSelection(descriptor);
-			    executeMethod("handleTabSelection", new Class[] {TabDescriptor.class}, new Object[] {descriptor});
-			}
-		}
-		
-		/**
-		 * Shows the given tab.
-		 */
-		private void showTab(TabContents target) {
-			if (target != null) {
-			    Composite tabComposite = (Composite) ((Map) getField("tabToComposite")).get(target);
-//				Composite tabComposite = (Composite) tabToComposite.get(target);
-				if (tabComposite != null) {
-					/**
-					 * the following method call order is important - do not
-					 * change it or the widgets might be drawn incorrectly
-					 */
-					tabComposite.moveAbove(null);
-					target.aboutToBeShown();
-					tabComposite.setVisible(true);
-				}
-			}
-		}
-		
-		/**
-		 * Hides the given tab.
-		 */
-		private void hideTab(TabContents target) {
-			if (target != null) {
-//				Composite tabComposite = (Composite) tabToComposite.get(target);
-			    Composite tabComposite = (Composite) ((Map) getField("tabToComposite")).get(target);
-				if (tabComposite != null) {
-					target.aboutToBeHidden();
-					tabComposite.setVisible(false);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * create a new tabbed property sheet page.
-	 * 
-	 * @param tabbedPropertySheetPageContributor
-	 *            the tabbed property sheet page contributor.
-	 */
-	public TabbedPropertySheetPage(
-			ITabbedPropertySheetPageContributor tabbedPropertySheetPageContributor) {
-	    super(tabbedPropertySheetPageContributor);
-//		contributor = tabbedPropertySheetPageContributor;
-//		tabToComposite = new HashMap();
-//		selectionQueue = new ArrayList(10);
-//		tabSelectionListeners = new ArrayList();
-//		initContributor(contributor.getContributorId());
-	}
-	
-	/**
-	 * @see org.eclipse.ui.part.IPage#createControl(org.eclipse.swt.widgets.Composite)
-	 */
-	public void createControl(Composite parent) {
-//		widgetFactory = new TabbedPropertySheetWidgetFactory();
-	    TabbedPropertySheetWidgetFactory widgetFactory = new TabbedPropertySheetWidgetFactory();
-	    setField("widgetFactory", widgetFactory);
-//		tabbedPropertyComposite = new TabbedPropertyComposite(parent,
-//			widgetFactory, hasTitleBar);
-	    TabbedPropertyComposite tabbedPropertyComposite =
-	        new TabbedPropertyComposite(parent, widgetFactory, ((Boolean) getField("hasTitleBar")).booleanValue());
-	    setField("tabbedPropertyComposite", tabbedPropertyComposite);
-		widgetFactory.paintBordersFor(tabbedPropertyComposite);
-		tabbedPropertyComposite.setLayout(new FormLayout());
-		FormData formData = new FormData();
-		formData.left = new FormAttachment(0, 0);
-		formData.right = new FormAttachment(100, 0);
-		formData.top = new FormAttachment(0, 0);
-		formData.bottom = new FormAttachment(100, 0);
-		tabbedPropertyComposite.setLayoutData(formData);
-
-//		tabbedPropertyViewer = new TabbedPropertyViewer(tabbedPropertyComposite.getList());
-		TabbedPropertyViewer tabbedPropertyViewer = new TabbedPropertyViewer(tabbedPropertyComposite.getList());
-		setField("tabbedPropertyViewer", tabbedPropertyViewer);
-		tabbedPropertyViewer.setContentProvider(tabListContentProvider);
-		tabbedPropertyViewer.setLabelProvider(new TabbedPropertySheetPageLabelProvider());
-		tabbedPropertyViewer.addSelectionChangedListener(new SelectionChangedListener());
-
-		/**
-		 * Add a part activation listener.
-		 */
-//		cachedWorkbenchWindow = getSite().getWorkbenchWindow();
-		IWorkbenchWindow cachedWorkbenchWindow = getSite().getWorkbenchWindow();
-		setField("cachedWorkbenchWindow", cachedWorkbenchWindow);
-//		cachedWorkbenchWindow.getPartService().addPartListener(partActivationListener);
-		cachedWorkbenchWindow.getPartService().addPartListener((IPartListener) getField("partActivationListener"));
-
-		/**
-		 * Add a label provider change listener.
-		 */
-//		if (hasTitleBar) {
-//			registry.getLabelProvider().addListener(this);
-//		}
-		if(((Boolean) getField("hasTitleBar")).booleanValue()) {
-		    ((TabbedPropertyRegistry) getField("registry")).getLabelProvider().addListener(this);
-		}
-	}
-	
-	@Override
-	public void dispose() {
-	    super.dispose();
-	    if(listeners.size() > 0) {
-	        Event e = new Event();
-	        e.widget = getControl();
-    	    DisposeEvent event = new DisposeEvent(e);
-    	    event.time = (int) System.currentTimeMillis();
-    	    event.widget = getControl();
-    	    event.data = this;
-    	    for(DisposeListener listener : listeners.toArray(new DisposeListener[listeners.size()])) {
-    	        listener.widgetDisposed(event);
-    	    }
-	    }
-	}
-	
-	public void addDisposeListener(DisposeListener listener) {
-	    if(!listeners.contains(listener)) {
-	        listeners.add(listener);
-	    }
-	}
-	
-	public void removeDisposeListener(DisposeListener listener) {
-	    listeners.remove(listener);
-	}
-	
+            if (descriptor != null) {
+//                handleTabSelection(descriptor);
+                executeMethod("handleTabSelection", new Class[] {ITabDescriptor.class}, new Object[] {descriptor});
+            }
+        }
+        
+        /**
+         * Shows the given tab.
+         */
+        private void showTab(TabContents target) {
+            if (target != null) {
+                Composite tabComposite = (Composite) ((Map) getField("tabToComposite")).get(target);
+//                Composite tabComposite = (Composite) tabToComposite.get(target);
+                if (tabComposite != null) {
+                    /**
+                     * the following method call order is important - do not
+                     * change it or the widgets might be drawn incorrectly
+                     */
+                    tabComposite.moveAbove(null);
+                    target.aboutToBeShown();
+                    tabComposite.setVisible(true);
+                }
+            }
+        }
+        
+        /**
+         * Hides the given tab.
+         */
+        private void hideTab(TabContents target) {
+            if (target != null) {
+//                Composite tabComposite = (Composite) tabToComposite.get(target);
+                Composite tabComposite = (Composite) ((Map) getField("tabToComposite")).get(target);
+                if (tabComposite != null) {
+                    target.aboutToBeHidden();
+                    tabComposite.setVisible(false);
+                }
+            }
+        }
+    }
+    
+    /**
+     * create a new tabbed property sheet page.
+     * 
+     * @param tabbedPropertySheetPageContributor
+     *            the tabbed property sheet page contributor.
+     */
+    public TabbedPropertySheetPage(
+            ITabbedPropertySheetPageContributor tabbedPropertySheetPageContributor) {
+        super(tabbedPropertySheetPageContributor);
+//        contributor = tabbedPropertySheetPageContributor;
+//        tabToComposite = new HashMap();
+//        selectionQueue = new ArrayList(10);
+//        tabSelectionListeners = new ArrayList();
+//        initContributor(contributor.getContributorId());
+    }
+    
+    /**
+     * @see org.eclipse.ui.part.IPage#createControl(org.eclipse.swt.widgets.Composite)
+     */
+    public void createControl(Composite parent) {
+//        widgetFactory = new TabbedPropertySheetWidgetFactory();
+        TabbedPropertySheetWidgetFactory widgetFactory = new TabbedPropertySheetWidgetFactory();
+        setField("widgetFactory", widgetFactory);
+//        tabbedPropertyComposite = new TabbedPropertyComposite(parent,
+//            widgetFactory, hasTitleBar);
+        TabbedPropertyComposite tabbedPropertyComposite =
+            new TabbedPropertyComposite(parent, widgetFactory, ((Boolean) getField("hasTitleBar")).booleanValue());
+        setField("tabbedPropertyComposite", tabbedPropertyComposite);
+        widgetFactory.paintBordersFor(tabbedPropertyComposite);
+        tabbedPropertyComposite.setLayout(new FormLayout());
+        FormData formData = new FormData();
+        formData.left = new FormAttachment(0, 0);
+        formData.right = new FormAttachment(100, 0);
+        formData.top = new FormAttachment(0, 0);
+        formData.bottom = new FormAttachment(100, 0);
+        tabbedPropertyComposite.setLayoutData(formData);
+        
+//        tabbedPropertyViewer = new TabbedPropertyViewer(tabbedPropertyComposite.getList());
+        TabbedPropertyViewer tabbedPropertyViewer = new TabbedPropertyViewer(tabbedPropertyComposite.getList());
+        setField("tabbedPropertyViewer", tabbedPropertyViewer);
+        tabbedPropertyViewer.setContentProvider(tabListContentProvider);
+        tabbedPropertyViewer.setLabelProvider(new TabbedPropertySheetPageLabelProvider());
+        tabbedPropertyViewer.addSelectionChangedListener(new SelectionChangedListener());
+        
+        /**
+         * Add a part activation listener.
+         */
+//        cachedWorkbenchWindow = getSite().getWorkbenchWindow();
+        IWorkbenchWindow cachedWorkbenchWindow = getSite().getWorkbenchWindow();
+        setField("cachedWorkbenchWindow", cachedWorkbenchWindow);
+//        cachedWorkbenchWindow.getPartService().addPartListener(partActivationListener);
+        cachedWorkbenchWindow.getPartService().addPartListener((IPartListener) getField("partActivationListener"));
+        
+        /**
+         * Add a label provider change listener.
+         */
+//        if (hasTitleBar) {
+//            registry.getLabelProvider().addListener(this);
+//        }
+        if(((Boolean) getField("hasTitleBar")).booleanValue()) {
+            ((TabbedPropertyRegistry) getField("registry")).getLabelProvider().addListener(this);
+        }
+    }
+    
+    @Override
+    public void dispose() {
+        super.dispose();
+        if(listeners.size() > 0) {
+            Event e = new Event();
+            e.widget = getControl();
+            DisposeEvent event = new DisposeEvent(e);
+            event.time = (int) System.currentTimeMillis();
+            event.widget = getControl();
+            event.data = this;
+            for(DisposeListener listener : listeners.toArray(new DisposeListener[listeners.size()])) {
+                listener.widgetDisposed(event);
+            }
+        }
+    }
+    
+    public void addDisposeListener(DisposeListener listener) {
+        if(!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+    
+    public void removeDisposeListener(DisposeListener listener) {
+        listeners.remove(listener);
+    }
+    
     @SuppressWarnings("all")
     protected Object executeMethod(String methodName, Class[] paramTypes, Object[] params) {
         Class c = getClass();

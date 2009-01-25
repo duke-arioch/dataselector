@@ -165,6 +165,8 @@ public class DatasourceConfigPage extends AbstractEditorPage
         driverCombo.setLayoutData(createGridData(SWT.FILL, true));
         driverCombo.addModifyListener(this);
         
+        SQLDriver.addPropertyChangeListener(this);
+        
         toolkit.createLabel(body, "Database URI:", SWT.LEFT).setLayoutData(createGridData(SWT.FILL, false));
         
         uriText = toolkit.createText(body, "", SWT.SINGLE | SWT.LEFT | SWT.BORDER);
@@ -361,7 +363,13 @@ public class DatasourceConfigPage extends AbstractEditorPage
     }
     
     public void propertyChange(PropertyChangeEvent evt) {
-        if(evt.getPropertyName().equals(LSConfig.PROPERTY_CONFIG_QUERY)) {
+    	if(evt.getSource().equals(SQLDriver.class)) {
+    		if(driverCombo != null && !driverCombo.isDisposed()) {
+	    		String selection = driverCombo.getText();
+	    		driverCombo.setItems(SQLDriver.getDriverNames().toArray(new String[0]));
+	    		driverCombo.setText(selection);
+    		}
+    	} else if(evt.getPropertyName().equals(LSConfig.PROPERTY_CONFIG_QUERY)) {
             queryText.setText((String) evt.getNewValue());
         } else if(evt.getPropertyName().equals(LSDriver.PROPERTY_ELEMENT_NAME)) {
             SQLDriver driver = SQLDriver.getDriverInstanceByName((String) evt.getNewValue());
@@ -449,6 +457,7 @@ public class DatasourceConfigPage extends AbstractEditorPage
                 getTree().getConfig().removePropertyChangeListener(this);
             }
         }
+        SQLDriver.removePropertyChangeListener(this);
     }
     
     public void setFocus() {
