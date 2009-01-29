@@ -2,7 +2,7 @@
 <feature
       id="com.nexusbpm.dataselector.product.feature"
       label="Data Selector Product Feature"
-      version="1.2.0"
+      version="1.2.1"
       provider-name="nexusBPM">
 
    <description url="http://www.example.com/description">
@@ -17,10 +17,9 @@
       [Enter License Description here.]
    </license>
 
-   <includes
-         id="com.nexusbpm.dataselector.feature"
-         version="1.2.0"
-         search-location="both"/>
+   <requires>
+      <import feature="com.nexusbpm.dataselector.feature" version="1.2.1" match="greaterOrEqual"/>
+   </requires>
 
    <plugin
          id="com.nexusbpm.dataselector.product"
