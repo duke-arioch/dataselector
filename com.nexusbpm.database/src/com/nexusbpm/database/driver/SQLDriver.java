@@ -20,6 +20,9 @@ public class SQLDriver implements Comparable<SQLDriver> {
     private String sampleConnectString;
     private String driverClassName;
     
+    private String stddevFunction;
+    private boolean supportsMinMaxStrings;
+    
     private boolean builtIn;
     
     private static void initialize() {
@@ -29,8 +32,13 @@ public class SQLDriver implements Comparable<SQLDriver> {
     }
     
     static final class SQLDriverCallback {
-        void addDriver(String name, String sample, String className, boolean builtIn) {
-            SQLDriver driver = new SQLDriver(name, sample, className, builtIn);
+        void addDriver(String name,
+                       String sample,
+                       String className,
+                       String stddevFunction,
+                       boolean minMaxStrings,
+                       boolean builtIn) {
+            SQLDriver driver = new SQLDriver(name, sample, className, stddevFunction, minMaxStrings, builtIn);
             drivers.add(driver);
             driverNames.add(name);
         }
@@ -122,20 +130,33 @@ public class SQLDriver implements Comparable<SQLDriver> {
         return null;
     }
     
-    public SQLDriver(String name, String sampleConnectString, String driverClassName) {
+    public SQLDriver(String name,
+                     String sampleConnectString,
+                     String driverClassName,
+                     String stddevFunction,
+                     boolean supportsMinMaxStrings) {
         if(name == null || sampleConnectString == null || driverClassName == null) {
             throw new IllegalArgumentException("SQL Driver information cannot be null");
         }
         this.name = name;
         this.sampleConnectString = sampleConnectString;
         this.driverClassName = driverClassName;
+        this.stddevFunction = stddevFunction;
+        this.supportsMinMaxStrings = supportsMinMaxStrings;
         this.builtIn = false;
     }
     
-    private SQLDriver(String name, String sampleConnectString, String driverClassName, boolean builtIn) {
+    private SQLDriver(String name,
+                      String sampleConnectString,
+                      String driverClassName,
+                      String stddevFunction,
+                      boolean supportsMinMaxStrings,
+                      boolean builtIn) {
         this.name = name;
         this.sampleConnectString = sampleConnectString;
         this.driverClassName = driverClassName;
+        this.stddevFunction = stddevFunction;
+        this.supportsMinMaxStrings = supportsMinMaxStrings;
         this.builtIn = builtIn;
     }
     
@@ -149,6 +170,14 @@ public class SQLDriver implements Comparable<SQLDriver> {
     
     public String getSampleConnectString() {
         return sampleConnectString;
+    }
+    
+    public String getStdDevFunction() {
+        return stddevFunction;
+    }
+    
+    public boolean supportsMinMaxStrings() {
+        return supportsMinMaxStrings;
     }
     
     public String toString() {

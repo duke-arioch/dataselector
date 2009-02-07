@@ -13,12 +13,20 @@ public class SQLDriverWrapper {
     protected String name;
     protected String sampleConnectString;
     protected String driverClassName;
+    protected String stdDevFunction;
+    protected boolean supportsMinMaxStrings;
     
-    public SQLDriverWrapper(String name, String sampleConnectString, String driverClassName) {
+    public SQLDriverWrapper(String name,
+                            String sampleConnectString,
+                            String driverClassName,
+                            String stdDevFunction,
+                            boolean supportsMinMaxStrings) {
         this.driver = null;
         this.name = name;
         this.sampleConnectString = sampleConnectString;
         this.driverClassName = driverClassName;
+        this.stdDevFunction = stdDevFunction;
+        this.supportsMinMaxStrings = supportsMinMaxStrings;
     }
     
     public SQLDriverWrapper(SQLDriver driver) {
@@ -28,6 +36,8 @@ public class SQLDriverWrapper {
             this.name = driver.getName();
             this.sampleConnectString = driver.getSampleConnectString();
             this.driverClassName = driver.getDriverClassName();
+            this.stdDevFunction = driver.getStdDevFunction();
+            this.supportsMinMaxStrings = driver.supportsMinMaxStrings();
         }
     }
     
@@ -65,6 +75,22 @@ public class SQLDriverWrapper {
     
     public void setDriverClassName(String driverClassName) {
         this.driverClassName = driverClassName;
+    }
+    
+    public String getStdDevFunction() {
+        return stdDevFunction;
+    }
+    
+    public void setStdDevFunction(String stdDevFunction) {
+        this.stdDevFunction = stdDevFunction;
+    }
+    
+    public boolean supportsMinMaxStrings() {
+        return supportsMinMaxStrings;
+    }
+    
+    public void setSupportsMinMaxStrings(boolean supportsMinMaxStrings) {
+        this.supportsMinMaxStrings = supportsMinMaxStrings;
     }
     
     @Override

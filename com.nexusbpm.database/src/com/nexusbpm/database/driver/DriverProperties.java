@@ -32,11 +32,11 @@ public class DriverProperties implements IPropertyChangeListener {
         addBuiltIn("JDBC-ODBC Bridge","jdbc:odbc:<DB>","sun.jdbc.odbc.JdbcOdbcDriver");
         addBuiltIn("Hypersonic SQL (v1.2 and earlier)","jdbc:HypersonicSQL:<DB>","hSql.hDriver");
         addBuiltIn("Hypersonic SQL (v1.3 and later)","jdbc:HypersonicSQL:<DB>","org.hsql.jdbcDriver");
-        addBuiltIn("Microsoft SQL Server (JTurbo Driver)","jdbc:JTurbo://<HOST>:<PORT>/<DB>","com.ashna.jturbo.driver.Driver");
-        addBuiltIn("Microsoft SQL Server (Sprinta Driver)","jdbc:inetdae:<HOST>:<PORT>?database=<DB>","com.inet.tds.TdsDriver");
-        addBuiltIn("Microsoft SQL Server 2000 (Microsoft Driver)","jdbc:microsoft:sqlserver://<HOST>:<PORT>[;DatabaseName=<DB>]","com.microsoft.jdbc.sqlserver.SQLServerDriver");
-        addBuiltIn("Microsoft SQL Server 2005 (Microsoft Driver)","jdbc:sqlserver://<HOST>:<PORT>[;databaseName=<DB>]","com.microsoft.sqlserver.jdbc.SQLServerDriver");
-        addBuiltIn("Microsoft SQL Server (Weblogic)","jdbc:weblogic:mssqlserver4:<DB>@<HOST>:<PORT>","weblogic.jdbc.mssqlserver4.Driver");
+        addBuiltIn("Microsoft SQL Server (JTurbo Driver)","jdbc:JTurbo://<HOST>:<PORT>/<DB>","com.ashna.jturbo.driver.Driver", "stdev", false);
+        addBuiltIn("Microsoft SQL Server (Sprinta Driver)","jdbc:inetdae:<HOST>:<PORT>?database=<DB>","com.inet.tds.TdsDriver", "stdev", false);
+        addBuiltIn("Microsoft SQL Server 2000 (Microsoft Driver)","jdbc:microsoft:sqlserver://<HOST>:<PORT>[;DatabaseName=<DB>]","com.microsoft.jdbc.sqlserver.SQLServerDriver", "stdev", false);
+        addBuiltIn("Microsoft SQL Server 2005 (Microsoft Driver)","jdbc:sqlserver://<HOST>:<PORT>[;databaseName=<DB>]","com.microsoft.sqlserver.jdbc.SQLServerDriver", "stdev", false);
+        addBuiltIn("Microsoft SQL Server (Weblogic)","jdbc:weblogic:mssqlserver4:<DB>@<HOST>:<PORT>","weblogic.jdbc.mssqlserver4.Driver", "stdev", false);
         addBuiltIn("MySQL (MM.MySQL Driver)","jdbc:mysql://<HOST>:<PORT>/<DB>","org.gjt.mm.mysql.Driver");
         addBuiltIn("Oracle OCI 8i","jdbc:oracle:oci8:@<SID>","oracle.jdbc.driver.OracleDriver");
         addBuiltIn("Oracle OCI 9i","jdbc:oracle:oci:@<SID>","oracle.jdbc.driver.OracleDriver");
@@ -44,7 +44,7 @@ public class DriverProperties implements IPropertyChangeListener {
         addBuiltIn("PointBase Embedded Server","jdbc:pointbase://embedded[:<PORT>]/<DB>","com.pointbase.jdbc.jdbcUniversalDriver");
         addBuiltIn("PostgreSQL (v6.5 and earlier)","jdbc:postgresql://<HOST>:<PORT>/<DB>","postgresql.Driver");
         addBuiltIn("PostgreSQL (v7.0 and later)","jdbc:postgresql://<HOST>:<PORT>/<DB>","org.postgresql.Driver");
-        addBuiltIn("SAS","jdbc:sharenet://<hostname>[:<portnumber>]","com.sas.net.sharenet.ShareNetDriver");
+        addBuiltIn("SAS","jdbc:sharenet://<hostname>[:<portnumber>]","com.sas.net.sharenet.ShareNetDriver", null);
         addBuiltIn("Sybase (jConnect 4.2 and earlier)","jdbc:sybase:Tds:<HOST>:<PORT>","com.sybase.jdbc.SybDriver");
         addBuiltIn("Sybase (jConnect 5.2)","jdbc:sybase:Tds:<HOST>:<PORT>","com.sybase.jdbc2.jdbc.SybDriver");
         addBuiltIn("Teradata driver (12.0.0.104 and later)", "jdbc:teradata://<HOST>[/DATABASE=<DB>,DBS_PORT=<PORT>,TMODE=ANSI]", "com.teradata.jdbc.TeraDriver");
@@ -68,7 +68,23 @@ public class DriverProperties implements IPropertyChangeListener {
     }
     
     protected void addBuiltIn(String name, String sample, String className) {
-        driverCallback.addDriver(name, sample, className, true);
+        addBuiltIn(name, sample, className, "stddev", true);
+    }
+    
+    protected void addBuiltIn(String name, String sample, String className, String stddevFunction) {
+        addBuiltIn(name, sample, className, stddevFunction, true);
+    }
+    
+    protected void addBuiltIn(String name, String sample, String className, boolean minMaxStrings) {
+        addBuiltIn(name, sample, className, "stddev", minMaxStrings);
+    }
+    
+    protected void addBuiltIn(String name,
+                              String sample,
+                              String className,
+                              String stddevFunction,
+                              boolean minMaxStrings) {
+        driverCallback.addDriver(name, sample, className, stddevFunction, minMaxStrings, true);
     }
     
     public void propertyChange(PropertyChangeEvent event) {
@@ -99,9 +115,16 @@ public class DriverProperties implements IPropertyChangeListener {
             String[] parts = driverString.split("\\|", -1);
             
             if(parts.length == 2) {
-                driverCallback.addDriver(parts[0], "", parts[1], false);
+                driverCallback.addDriver(parts[0], "", parts[1], "stddev", true, false);
             } else if(parts.length == 3) {
-                driverCallback.addDriver(parts[0], parts[1], parts[2], false);
+                driverCallback.addDriver(parts[0], parts[1], parts[2], "stddev", true, false);
+            } else if(parts.length == 5) {
+                String stdDevFunction = null;
+                if(parts[3].length() > 0) {
+                    stdDevFunction = parts[3];
+                }
+                boolean minMaxStrings = Boolean.parseBoolean(parts[4]);
+                driverCallback.addDriver(parts[0], parts[1], parts[2], stdDevFunction, minMaxStrings, false);
             }
         }
     }
@@ -117,7 +140,9 @@ public class DriverProperties implements IPropertyChangeListener {
             buffer.append("(|")
                 .append(verifyString(driver.getName())).append('|')
                 .append(verifyString(driver.getSampleConnectString())).append('|')
-                .append(verifyString(driver.getDriverClassName())).append("|)");
+                .append(verifyString(driver.getDriverClassName())).append('|')
+                .append(verifyStdDevString(driver.getStdDevFunction())).append('|')
+                .append(verifyString(String.valueOf(driver.supportsMinMaxStrings()))).append("|)");
         }
         
         return buffer.toString();
@@ -132,5 +157,12 @@ public class DriverProperties implements IPropertyChangeListener {
             str = str.substring(0, str.length() - 1);
         }
         return str;
+    }
+    
+    protected String verifyStdDevString(String str) {
+        if(str == null) {
+            str = "";
+        }
+        return verifyString(str);
     }
 }

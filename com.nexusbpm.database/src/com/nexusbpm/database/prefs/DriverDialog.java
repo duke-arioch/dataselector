@@ -7,8 +7,11 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -19,12 +22,17 @@ public class DriverDialog extends Dialog {
     protected Text driverNameText;
     protected Text driverSampleConnectStringText;
     protected Text driverClassNameText;
+    protected Button stdDevFunctionButton;
+    protected Text stdDevFunctionText;
+    protected Button minMaxStringsButton;
     
     protected Label errorMessageLabel;
     
     protected String driverName;
     protected String driverSampleConnectString;
     protected String driverClassName;
+    protected String stdDevFunction;
+    protected boolean minMaxStrings;
     
     protected List<String> invalidNames;
     
@@ -40,19 +48,57 @@ public class DriverDialog extends Dialog {
         return driverName;
     }
     
+    public void setDriverName(String driverName) {
+        this.driverName = driverName;
+    }
+    
     public String getDriverSampleConnectString() {
         return driverSampleConnectString;
+    }
+    
+    public void setDriverSampleConnectString(String driverSampleConnectString) {
+        this.driverSampleConnectString = driverSampleConnectString;
     }
     
     public String getDriverClassName() {
         return driverClassName;
     }
     
-    public void initialize(String driverName, String driverSampleConnectString, String driverClassName) {
-        this.driverName = driverName;
-        this.driverSampleConnectString = driverSampleConnectString;
+    public void setDriverClassName(String driverClassName) {
         this.driverClassName = driverClassName;
     }
+    
+    public String getStdDevFunction() {
+        if(stdDevFunctionButton == null || stdDevFunctionButton.getSelection()) {
+            return stdDevFunction;
+        } else {
+            return null;
+        }
+    }
+    
+    public void setStdDevFunction(String stdDevFunction) {
+        this.stdDevFunction = stdDevFunction;
+    }
+    
+    public boolean supportsMinMaxStrings() {
+        return minMaxStrings;
+    }
+    
+    public void setSupportsMinMaxStrings(boolean minMaxStrings) {
+        this.minMaxStrings = minMaxStrings;
+    }
+    
+//    public void initialize(String driverName,
+//                           String driverSampleConnectString,
+//                           String driverClassName,
+//                           String stdDevFunction,
+//                           boolean minMaxStrings) {
+//        this.driverName = driverName;
+//        this.driverSampleConnectString = driverSampleConnectString;
+//        this.driverClassName = driverClassName;
+//        this.stdDevFunction = stdDevFunction;
+//        this.minMaxStrings = minMaxStrings;
+//    }
     
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
@@ -73,6 +119,12 @@ public class DriverDialog extends Dialog {
         GridLayout layout = (GridLayout) composite.getLayout();
         layout.numColumns = 1;
         
+        ModifyListener validateInputListener = new ModifyListener() {
+            public void modifyText(ModifyEvent e) {
+                validateInput();
+            }
+        };
+        
         GridData data;
         
         Label driverNameLabel = new Label(composite, SWT.LEFT);
@@ -89,11 +141,7 @@ public class DriverDialog extends Dialog {
         data = new GridData(SWT.FILL, SWT.CENTER, true, false);
         data.widthHint = 180;
         driverNameText.setLayoutData(data);
-        driverNameText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
-                validateInput();
-            }
-        });
+        driverNameText.addModifyListener(validateInputListener);
         
         Label driverSampleConnectStringLabel = new Label(composite, SWT.LEFT);
         driverSampleConnectStringLabel.setText("Sample Connect String:");
@@ -108,11 +156,7 @@ public class DriverDialog extends Dialog {
         data = new GridData(SWT.FILL, SWT.CENTER, true, false);
         data.widthHint = 150;
         driverSampleConnectStringText.setLayoutData(data);
-        driverSampleConnectStringText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
-                validateInput();
-            }
-        });
+        driverSampleConnectStringText.addModifyListener(validateInputListener);
         
         Label driverClassNameLabel = new Label(composite, SWT.LEFT);
         driverClassNameLabel.setText("Driver class name:");
@@ -127,11 +171,36 @@ public class DriverDialog extends Dialog {
         data = new GridData(SWT.FILL, SWT.CENTER, true, false);
         data.widthHint = 150;
         driverClassNameText.setLayoutData(data);
-        driverClassNameText.addModifyListener(new ModifyListener() {
-            public void modifyText(ModifyEvent e) {
-                validateInput();
+        driverClassNameText.addModifyListener(validateInputListener);
+        
+        stdDevFunctionButton = new Button(composite, SWT.CHECK | SWT.LEFT);
+        stdDevFunctionButton.setText("Supports Standard Deviation");
+        if(stdDevFunction != null && stdDevFunction.length() > 0) {
+            stdDevFunctionButton.setSelection(true);
+        }
+        data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        stdDevFunctionButton.setLayoutData(data);
+        stdDevFunctionButton.addSelectionListener(new SelectionListener() {
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+            public void widgetSelected(SelectionEvent e) {
+                stdDevFunctionText.setEnabled(stdDevFunctionButton.getSelection());
             }
         });
+        
+        stdDevFunctionText = new Text(composite, SWT.SINGLE | SWT.BORDER);
+        if(stdDevFunction != null) {
+            stdDevFunctionText.setText(stdDevFunction);
+        }
+        data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        stdDevFunctionText.setLayoutData(data);
+        stdDevFunctionText.addModifyListener(validateInputListener);
+        
+        minMaxStringsButton = new Button(composite, SWT.CHECK | SWT.LEFT);
+        minMaxStringsButton.setText("Supports MIN(VARCHAR) and MAX(VARCHAR)");
+        minMaxStringsButton.setSelection(minMaxStrings);
+        data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        minMaxStringsButton.setLayoutData(data);
         
         errorMessageLabel = new Label(composite, SWT.LEFT | SWT.WRAP);
         data = new GridData(SWT.FILL, SWT.FILL, false, false);
@@ -182,6 +251,16 @@ public class DriverDialog extends Dialog {
             }
         }
         
+        if(stdDevFunctionText != null && message.length() == 0 &&
+                stdDevFunctionButton != null && stdDevFunctionButton.getSelection()) {
+            String stddev = stdDevFunctionText.getText();
+            if(stddev.contains("(") || stddev.contains(")")) {
+                message = "The standard deviation function cannot contain \"(\" or \")\"";
+            } else if(stddev.contains("|")) {
+                message = "The standard deviation function cannot contain \"|\"";
+            }
+        }
+        
         if(errorMessageLabel != null) {
             errorMessageLabel.setText(message);
         }
@@ -196,10 +275,14 @@ public class DriverDialog extends Dialog {
             driverName = driverNameText.getText();
             driverSampleConnectString = driverSampleConnectStringText.getText();
             driverClassName = driverClassNameText.getText();
+            stdDevFunction = stdDevFunctionText.getText();
+            minMaxStrings = minMaxStringsButton.getSelection();
         } else {
             driverName = null;
             driverSampleConnectString = null;
             driverClassName = null;
+            stdDevFunction = null;
+            minMaxStrings = false;
         }
         super.buttonPressed(buttonId);
     }

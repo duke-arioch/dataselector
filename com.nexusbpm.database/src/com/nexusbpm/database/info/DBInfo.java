@@ -11,6 +11,7 @@ public interface DBInfo {
     boolean supportsMax(DBColumn column);
     boolean supportsAverage(DBColumn column);
     boolean supportsStandardDeviation(DBColumn column);
+    String getStandardDeviationFunction(DBColumn column);
     boolean supportsSum(DBColumn column);
     boolean isContinuous(DBColumn column);
 }

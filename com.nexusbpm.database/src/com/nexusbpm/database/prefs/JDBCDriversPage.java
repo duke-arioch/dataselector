@@ -294,13 +294,17 @@ public class JDBCDriversPage extends PreferencePage implements IWorkbenchPrefere
         DriverDialog dialog = new DriverDialog(getShell());
         
         dialog.setInvalidNames(driverProvider.getDriverNames());
+        dialog.setStdDevFunction("stddev");
+        dialog.setSupportsMinMaxStrings(true);
         
         int choice = dialog.open();
         if(choice == Window.OK) {
             SQLDriverWrapper driver = new SQLDriverWrapper(
                     dialog.getDriverName(),
                     dialog.getDriverSampleConnectString(),
-                    dialog.getDriverClassName());
+                    dialog.getDriverClassName(),
+                    dialog.getStdDevFunction(),
+                    dialog.supportsMinMaxStrings());
             driverProvider.addDriver(driver);
             driversTableViewer.add(driver);
         }
@@ -316,7 +320,12 @@ public class JDBCDriversPage extends PreferencePage implements IWorkbenchPrefere
         names.remove(driver.getName());
         
         dialog.setInvalidNames(names);
-        dialog.initialize(driver.getName(), driver.getSampleConnectString(), driver.getDriverClassName());
+//        dialog.initialize(driver.getName(), driver.getSampleConnectString(), driver.getDriverClassName());
+        dialog.setDriverName(driver.getName());
+        dialog.setDriverSampleConnectString(driver.getSampleConnectString());
+        dialog.setDriverClassName(driver.getDriverClassName());
+        dialog.setStdDevFunction(driver.getStdDevFunction());
+        dialog.setSupportsMinMaxStrings(driver.supportsMinMaxStrings());
         
         int choice = dialog.open();
         if(choice == Window.OK) {
@@ -390,7 +399,9 @@ public class JDBCDriversPage extends PreferencePage implements IWorkbenchPrefere
                 drivers.add(new SQLDriver(
                         wrapper.getName(),
                         wrapper.getSampleConnectString(),
-                        wrapper.getDriverClassName()));
+                        wrapper.getDriverClassName(),
+                        wrapper.getStdDevFunction(),
+                        wrapper.supportsMinMaxStrings()));
             }
         }
         

@@ -5,16 +5,21 @@ import java.math.BigInteger;
 import java.sql.Types;
 
 public class GenericDBInfo implements DBInfo {
-    private boolean supportsStdDev;
+//    private boolean supportsStdDev;
+    private String stdDevFunction;
     private boolean supportsMinMaxStrings;
     
     public GenericDBInfo() {
-        this.supportsStdDev = true;
+//        this.supportsStdDev = true;
+        this.stdDevFunction = "stddev";
         this.supportsMinMaxStrings = true;
     }
     
-    public GenericDBInfo(boolean supportsStdDev, boolean supportsMinMaxStrings) {
-        this.supportsStdDev = supportsStdDev;
+    public GenericDBInfo(String stdDevFunction,
+//                         boolean supportsStdDev,
+                         boolean supportsMinMaxStrings) {
+//        this.supportsStdDev = supportsStdDev;
+        this.stdDevFunction = stdDevFunction;
         this.supportsMinMaxStrings = supportsMinMaxStrings;
     }
     
@@ -85,7 +90,11 @@ public class GenericDBInfo implements DBInfo {
     }
     
     public boolean supportsStandardDeviation(DBColumn column) {
-        return supportsStdDev && isNumeric(column);
+        return /*supportsStdDev*/ stdDevFunction != null && stdDevFunction.length() > 0 && isNumeric(column);
+    }
+    
+    public String getStandardDeviationFunction(DBColumn column) {
+        return stdDevFunction;
     }
     
     public boolean supportsSum(DBColumn column) {
