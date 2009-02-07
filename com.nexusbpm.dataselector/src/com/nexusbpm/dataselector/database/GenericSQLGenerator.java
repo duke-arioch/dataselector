@@ -247,7 +247,7 @@ public class GenericSQLGenerator extends AbstractDataConditionGenerator implemen
         
         String stddev;
         if(info.supportsStandardDeviation(column)) {
-            stddev = "stddev(" + columnName + ")";
+            stddev = info.getStandardDeviationFunction(column) + "(" + columnName + ")";
         } else {
             stddev = NA;
         }
