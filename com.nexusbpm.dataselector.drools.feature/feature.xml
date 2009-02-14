@@ -2,7 +2,7 @@
 <feature
       id="com.nexusbpm.dataselector.drools.feature"
       label="Data Selector Drools Feature"
-      version="1.0.2"
+      version="1.0.3"
       provider-name="nexusBPM">
 
    <description url="http://www.example.com/description">
