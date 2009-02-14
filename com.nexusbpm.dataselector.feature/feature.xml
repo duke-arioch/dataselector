@@ -2,7 +2,7 @@
 <feature
       id="com.nexusbpm.dataselector.feature"
       label="Data Selector Feature"
-      version="1.2.2"
+      version="1.2.3"
       provider-name="nexusBPM">
 
    <description url="http://www.example.com/description">
