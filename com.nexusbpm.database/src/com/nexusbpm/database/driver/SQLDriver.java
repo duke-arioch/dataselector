@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class SQLDriver implements Comparable<SQLDriver> {
     public static final String DRIVERS_PROPERTY_NAME = "JDBC Drivers";
@@ -114,20 +112,24 @@ public class SQLDriver implements Comparable<SQLDriver> {
     
     public static synchronized SQLDriver getDriverInstanceByClassNameAndURI(String className, String uri) {
         initialize();
-        Pattern regex = Pattern.compile("jdbc:\\w*:{0,1}\\w*");
+        SQLDriver ret = null;
+        int distance = Integer.MAX_VALUE;
+        int matchLength = 0;
         for (int index = 0; index < drivers.size(); index++) {
             SQLDriver driver = drivers.get(index);
             String sample = driver.getSampleConnectString();
-            Matcher m = regex.matcher(sample);
-            m.find();
-            String split = m.group();
-            if (driver.getDriverClassName().equals(className)
-                && uri.startsWith(split)
-               ) { 
-                return driver;
+            if(driver.getDriverClassName().equals(className)) {
+                int newMatchLength = getMatchLength(sample.toLowerCase(), uri.toLowerCase());
+                int newDistance = getEditDistance(sample.toLowerCase(), uri.toLowerCase());
+                if((matchLength == newMatchLength && newDistance < distance) ||
+                        newMatchLength > matchLength) {
+                    ret = driver;
+                    matchLength = newMatchLength;
+                    distance = newDistance;
+                }
             }
         }
-        return null;
+        return ret;
     }
     
     public SQLDriver(String name,
@@ -190,5 +192,63 @@ public class SQLDriver implements Comparable<SQLDriver> {
     
     public int compareTo(SQLDriver o) {
         return name.compareTo(o.name);
+    }
+    
+    protected static int getMatchLength(String string1, String string2) {
+        int length = 0;
+        for(int index = 0; index < string1.length() && index < string2.length(); index++) {
+            if(string1.charAt(index) != string2.charAt(index)) {
+                break;
+            }
+            length += 1;
+        }
+        return length;
+    }
+    
+    /**
+     * Compute Levenshtein (edit) distance.
+     */
+    protected static int getEditDistance(String string1, String string2) {
+        int string1Length = string1.length();
+        int string2Length = string2.length();
+        
+        // Step 1
+        if(string1Length == 0) {
+            return string2Length;
+        }
+        if(string2Length == 0) {
+            return string1Length;
+        }
+        int[][] matrix = new int[string1Length + 1][string2Length + 1];
+        
+        // Step 2
+        for(int index1 = 0; index1 <= string1Length; index1++) {
+            matrix[index1][0] = index1;
+        }
+        for(int index2 = 0; index2 <= string2Length; index2++) {
+            matrix[0][index2] = index2;
+        }
+        
+        // Step 3
+        for(int index1 = 1; index1 <= string1Length; index1++) {
+            char c1 = string1.charAt(index1 - 1);
+            // Step 4
+            for(int index2 = 1; index2 <= string2Length; index2++) {
+                char c2 = string2.charAt(index2 - 1);
+                // Step 5
+                int cost = 1;
+                if(c1 == c2) {
+                    cost = 0;
+                }
+                // Step 6
+                matrix[index1][index2] =
+                    Math.min(Math.min(matrix[index1 - 1][index2] + 1,
+                                      matrix[index1][index2 - 1]),
+                             matrix[index1 - 1][index2 - 1] + cost);
+            }
+        }
+        
+        // Step 7
+        return matrix[string1Length][string2Length];
     }
 }
