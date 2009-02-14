@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Data Selector Drools Plug-in
 Bundle-SymbolicName: com.nexusbpm.dataselector.drools;singleton:=true
-Bundle-Version: 1.0.2
+Bundle-Version: 1.0.3
 Bundle-Activator: com.nexusbpm.dataselector.drools.Plugin
 Bundle-Vendor: nexusBPM
 Require-Bundle: com.nexusbpm.database;bundle-version="1.2.0",
