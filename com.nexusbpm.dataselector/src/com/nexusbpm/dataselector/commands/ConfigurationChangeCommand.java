@@ -2,6 +2,8 @@ package com.nexusbpm.dataselector.commands;
 
 import java.util.List;
 
+import org.eclipse.core.internal.runtime.Log;
+
 import com.nexusbpm.database.driver.SQLDriver;
 import com.nexusbpm.dataselector.connection.ConnectionPool;
 import com.nexusbpm.dataselector.controller.GraphUpdateQueue;

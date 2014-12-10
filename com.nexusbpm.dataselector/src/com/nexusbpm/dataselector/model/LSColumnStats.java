@@ -111,7 +111,7 @@ public class LSColumnStats extends AbstractModelElement implements Comparable<LS
     }
     
     public int compareTo(LSColumnStats o) {
-        if(columnOrdinal == o.columnOrdinal) throw new IllegalStateException("Columns cannot have equal ordinals!");
+//        if(columnOrdinal == o.columnOrdinal) throw new IllegalStateException("Columns cannot have equal ordinals!");
         return columnOrdinal - o.columnOrdinal;
     }
 }

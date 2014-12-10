@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/com.nexusbpm.dataselector.feature_1.2.1.jar" id="com.nexusbpm.dataselector.feature" version="1.2.1">
+   <feature url="features/com.nexusbpm.dataselector.feature_1.2.3.jar" id="com.nexusbpm.dataselector.feature" version="1.2.3">
       <category name="com.nexusbpm.dataselector"/>
    </feature>
-   <feature url="features/com.nexusbpm.dataselector.product.feature_1.2.1.jar" id="com.nexusbpm.dataselector.product.feature" version="1.2.1">
+   <feature url="features/com.nexusbpm.dataselector.product.feature_1.2.3.jar" id="com.nexusbpm.dataselector.product.feature" version="1.2.3">
       <category name="com.nexusbpm.dataselector"/>
    </feature>
-   <feature url="features/com.nexusbpm.dataselector.drools.feature_1.0.2.jar" id="com.nexusbpm.dataselector.drools.feature" version="1.0.2">
+   <feature url="features/com.nexusbpm.dataselector.drools.feature_1.0.3.jar" id="com.nexusbpm.dataselector.drools.feature" version="1.0.3">
       <category name="com.nexusbpm.dataselector"/>
    </feature>
    <category-def name="com.nexusbpm.dataselector" label="Data Selector"/>

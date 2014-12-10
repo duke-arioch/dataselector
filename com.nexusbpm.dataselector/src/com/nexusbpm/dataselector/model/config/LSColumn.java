@@ -72,6 +72,7 @@ public class LSColumn extends NamedModelElement implements Comparable<LSColumn>,
     }
     
     public void setOrdinal(int ordinal) {
+	System.out.println("Setting ordinal: " + ordinal + " on " + this);
         Integer oldOrdinal = Integer.valueOf(this.ordinal);
         this.ordinal = ordinal;
         firePropertyChange(PROPERTY_COLUMN_ORDINAL, oldOrdinal, Integer.valueOf(ordinal));
@@ -88,7 +89,7 @@ public class LSColumn extends NamedModelElement implements Comparable<LSColumn>,
     }
     
     public int compareTo(LSColumn o) {
-        if(ordinal == o.ordinal) throw new IllegalStateException("Columns cannot have equal ordinals!");
+//        if(ordinal == o.ordinal) throw new IllegalStateException("Columns cannot have equal ordinals:" + this + " vs " + o);
         return ordinal - o.ordinal;
     }
 }
