@@ -1,0 +1,5 @@
+.metadata
+*.site/features
+*.site/plugins
+*.site/web
+*.site/*.jar
